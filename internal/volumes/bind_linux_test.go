@@ -34,3 +34,18 @@ func TestBindFromChroot(t *testing.T) {
 	require.NoError(t, mount.Unmount(subdir), "unmounting bind-mounted directory")
 	require.NoError(t, mount.Unmount(subfile), "unmounting bind-mounted file")
 }
+
+func TestBindFromChrootWhileExecutingFile(t *testing.T) {
+	t.Parallel()
+	if os.Getuid() != 0 {
+		t.Skip("not running as root, assuming we can't mount or chroot")
+	}
+
+	executable, err := os.Executable()
+	require.NoError(t, err, "locating the test executable")
+	boundFile, err := bindFromChroot(filepath.Dir(executable), filepath.Base(executable), t.TempDir())
+	require.NoError(t, err, "bind mounting the executing test binary")
+	t.Cleanup(func() {
+		require.NoError(t, mount.Unmount(boundFile), "unmounting the executing test binary")
+	})
+}

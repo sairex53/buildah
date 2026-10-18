@@ -22,7 +22,7 @@ func bindFromChroot(root, path, tmp string) (string, error) {
 		if !errors.Is(err, unix.ENOTDIR) {
 			return "", fmt.Errorf("opening directory %q under %q: %w", path, root, err)
 		}
-		fd, _, err = open.InChroot(root, "", path, unix.O_RDWR, 0)
+		fd, _, err = open.InChroot(root, "", path, unix.O_RDONLY, 0)
 		if err != nil {
 			return "", fmt.Errorf("opening non-directory %q under %q: %w", path, root, err)
 		}
